@@ -17,6 +17,11 @@ import cs601.project4.Database.DBManager;
 import cs601.project4.Users.Users;
 
 //POST /create
+/**
+ * handles create user api in back end
+ * @author dhartimadeka
+ *
+ */
 @SuppressWarnings("serial")
 public class CreateUser extends HttpServlet
 {

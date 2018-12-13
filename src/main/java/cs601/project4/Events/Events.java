@@ -1,5 +1,10 @@
 package cs601.project4.Events;
 
+/**
+ * events - holds get list of events response
+ * @author dhartimadeka
+ *
+ */
 public class Events 
 {
 	// column_name = event_id

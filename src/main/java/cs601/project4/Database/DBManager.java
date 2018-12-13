@@ -11,31 +11,31 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
-
-import com.google.gson.Gson;
-
-import cs601.project4.RequestResponseManager;
 import cs601.project4.Events.CreateEventBuffer;
 import cs601.project4.Events.CreateEventResponse;
 import cs601.project4.Events.EventList;
 import cs601.project4.Events.EventPurchaseBean;
 import cs601.project4.Events.EventResponseWithEventId;
-import cs601.project4.Events.Events;
-import cs601.project4.Tickets.AddTicketBean;
-import cs601.project4.Tickets.Tickets;
+
 import cs601.project4.Tickets.TransferTicketBuffer;
 import cs601.project4.Users.Users;
-import javafx.scene.chart.PieChart.Data;
+/**
+ * DBManager - stores all sql method with database
+ * @author dhartimadeka
+ *
+ */
 public class DBManager 
 {
 
-	PreparedStatement stmt;
-	ResultSet result;
-	Users user = null;
-	Events events;
-	Gson gson = new Gson();
-	Connection con = ConnectionDB.getInstance().connectDatabase();
-
+	private PreparedStatement stmt;
+	private ResultSet result;
+	private Users user = null;
+	private Connection con = ConnectionDB.getInstance().connectDatabase();
+	/**
+	 * getUser - it will return details users
+	 * @param userId - holds user id to be passed in user table.
+	 * @return
+	 */
 	public synchronized Users getUser(int userId) 
 	{
 		Users user = new Users();
@@ -56,12 +56,12 @@ public class DBManager
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 		return user;
-
 	}
-
-	//list of all events
+	/**
+	 * getEventList - it will get list of events from database
+	 * @return list of events from database
+	 */
 	public synchronized List<EventList> getEventList() 
 	{
 		List<EventList> resultlist = new ArrayList<EventList>();
@@ -73,24 +73,24 @@ public class DBManager
 		{
 			stmt = con.prepareStatement(sql);
 			result = stmt.executeQuery();
-			//			if(result == null)
-			//			{
-			//				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			//			}
 			while(result.next())
 			{
-				//System.out.println(resultSet.getString(1));
 				listEvent = new EventList(result.getInt(DatabaseFields.eventId), result.getString(DatabaseFields.eventName)
 						, result.getInt(DatabaseFields.userId), result.getInt(DatabaseFields.availTickets), result.getInt(DatabaseFields.purchaseTicekts));
 				resultlist.add(listEvent);
 			}
 		} catch (SQLException e) 
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return resultlist;
 	}
+	/**
+	 * getEventDetailsWithId - gives details list of events in front end.
+	 * @param eventId - pass eventid into event service to get list of events in detail
+	 * @param resp - gives response of http servlet response
+	 * @return
+	 */
 	//details of specific events
 	public synchronized EventResponseWithEventId getEventDetailsWithId(int eventId, HttpServletResponse resp)
 	{
@@ -118,70 +118,21 @@ public class DBManager
 				}
 				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			} else {
-				// {
-				// data from database
-//result.getInt(DatabaseFields.numTicket),
 				listEvent =  new EventResponseWithEventId (result.getInt(DatabaseFields.eventId), 
 						result.getString(DatabaseFields.eventName), result.getInt(DatabaseFields.userId), 
 						result.getInt(DatabaseFields.availTickets), result.getInt(DatabaseFields.purchaseTicekts));
-//				listEvent = new Events(result.getInt(DatabaseFields.eventId),
-//						result.getString(DatabaseFields.eventName), result.getInt(DatabaseFields.userId),
-//						result.getInt(DatabaseFields.numTicket), 
-//						 result.getInt(DatabaseFields.availTickets),
-//						result.getInt(DatabaseFields.purchaseTicekts));
-				// resultlist.add(listEvent);
-				// }
 			}
 		} catch (SQLException e) {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			e.printStackTrace();
 		}
 		return listEvent;
-		//		resp.setStatus(HttpServletResponse.SC_OK);
-		//		Events listEvent= null;
-		//		String sql = "SELECT " + DatabaseFields.eventId + " , " + DatabaseFields.eventName + " , " + DatabaseFields.userId + " , " +
-		//				DatabaseFields.availTickets + " , " + DatabaseFields.purchaseTicekts + " FROM "
-		//				+ DatabaseFields.eventTable + " where "+ DatabaseFields.eventId + " = ?";
-		//		System.out.println("sql " + sql);
-		//		try 
-		//		{
-		//			stmt = con.prepareStatement(sql);
-		//			stmt.setInt(1, eventId);
-		//			result = stmt.executeQuery();
-		//			if(result == null)
-		//			{
-		//				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-		//			}
-		//			boolean flag = result.next();
-		//			if(!(flag))
-		//			{
-		//				try {
-		//					resp.getWriter().append("Event not found");
-		//				} catch (IOException e) {
-		//					// TODO Auto-generated catch block
-		//					e.printStackTrace();
-		//				}
-		//				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-		//			}
-		//			else {
-		//				//{
-		//				//data from database
-		//				listEvent = new Events(result.getInt(DatabaseFields.eventId), result.getString(DatabaseFields.eventName)
-		//						, result.getInt(DatabaseFields.userId), result.getInt(DatabaseFields.availTickets), 
-		//						result.getInt(DatabaseFields.purchaseTicekts));
-		//				//resultlist.add(listEvent);
-		//				//}
-		//			}
-		//		}
-		//		catch (SQLException e) 
-		//		{
-		//			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-		//			e.printStackTrace();
-		//		}
-		//		return listEvent;
 	}
-
-
+	/**
+	 * createUser - used to create user in user table. 
+	 * @param userDetail - pass user request body to table with username in it
+	 * @return
+	 */
 	//create user
 	public synchronized Users createUser(Users userDetail) {
 		int record = 0;
@@ -202,7 +153,13 @@ public class DBManager
 		}
 		return user;
 	}
-
+	/**
+	 * addTickets - it will add tickets in tickets table
+	 * @param userId - holds userid of user who will purchase ticket
+	 * @param eventId - holds event id to pass it to ticket table
+	 * @param tickets - holds number of tickets to be bought
+	 * @return
+	 */
 	//add tickets
 	public synchronized boolean addTickets(int userId, int eventId, int tickets) 
 	{
@@ -267,7 +224,10 @@ public class DBManager
 			return false;
 		}
 	}
-
+	/**
+	 * getAllUsers - it gives list of users from user table
+	 * @return
+	 */
 	//get list of users
 	public synchronized List<Users> getAllUsers() {
 		List<Users> allUsers = new ArrayList<Users>();
@@ -289,20 +249,21 @@ public class DBManager
 		}
 		return allUsers;
 	}
+	/**
+	 * getUserTickets - it gives list of tickets a user has from ticket's table
+	 * @param userId - pass user id to fetch data
+	 * @return
+	 */
 	//get list of user tickets
 	public synchronized List<HashMap<String, Integer>> getUserTickets(int userId) {
-
 		List<HashMap<String, Integer>> userTickets = new ArrayList<HashMap<String, Integer>>();
-
 		String sql = "select " + DatabaseFields.eventId + ", " + DatabaseFields.ticketCount + " from "
 				+ DatabaseFields.ticketTable + " where " + DatabaseFields.userId + " = ?";
 		System.out.println(sql);
 		try {
 			stmt = con.prepareStatement(sql);
 			stmt.setInt(1, userId);
-
 			result = stmt.executeQuery();
-
 			while (result.next()) {
 				int counter = result.getInt(DatabaseFields.ticketCount);
 				while (counter != 0) {
@@ -318,9 +279,7 @@ public class DBManager
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 		return userTickets;
-
 	}
 
 	//user exist
@@ -341,7 +300,11 @@ public class DBManager
 		}
 		return false;
 	}
-
+	/**
+	 * createEvent - to create event in event't table
+	 * @param createEventDetails passes event's details
+	 * @return
+	 */
 	//create event
 	public synchronized CreateEventResponse createEvent(CreateEventBuffer createEventDetails)
 	{
@@ -371,7 +334,12 @@ public class DBManager
 		}
 		return events;
 	}
-
+	/**
+	 * updateEvents - update eventTable and ticket table when ticket is purchased
+	 * @param event - pass event details
+	 * @param addtickets -passes purchase body
+	 * @return
+	 */
 	//update event table after add or purchase of tickets
 	public synchronized boolean updateEvents(EventResponseWithEventId event, EventPurchaseBean addtickets)
 	{
@@ -396,6 +364,13 @@ public class DBManager
 		}
 		return result;
 	}
+	/**
+	 * transferTicket - transfer ticket from one user to another
+	 * @param transferTickets - it holds details of tickets to transfer
+	 * @param userid - holds userid from to fetch data
+	 * @param resp - hold's respective response code
+	 * @return
+	 */
 	//transfer ticket
 	public synchronized boolean transferTicket(TransferTicketBuffer transferTickets, int userid,
 			HttpServletResponse resp) {
@@ -457,22 +432,29 @@ public class DBManager
 
 		return false;
 	}
+	/**
+	 * updateTicketCount - update ticket if user already exists here. 
+	 * @param userid - holds userid to fetch data
+	 * @param eventid - holds eventid to fetch data
+	 * @param ticketCount - holds number of tickets of which place
+	 * @return
+	 */
 	// Update table for Ticket Transfer
-		public int updateTicketCount(int userid, int eventid, int ticketCount) {
-			int record = 0;
-			String updtUser = "update " + DatabaseFields.ticketTable + " set " + DatabaseFields.ticketCount + "= ?"
-					+ " where " + DatabaseFields.userId + "= ?" + " AND " + DatabaseFields.eventId + "= ?";
-			try {
-				stmt = con.prepareStatement(updtUser);
-				stmt.setInt(1, ticketCount);
-				stmt.setInt(2, userid);
-				stmt.setInt(3, eventid);
-				System.out.println(stmt);
-				record = stmt.executeUpdate();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			return record;
-
+	public int updateTicketCount(int userid, int eventid, int ticketCount) {
+		int record = 0;
+		String updtUser = "update " + DatabaseFields.ticketTable + " set " + DatabaseFields.ticketCount + "= ?"
+				+ " where " + DatabaseFields.userId + "= ?" + " AND " + DatabaseFields.eventId + "= ?";
+		try {
+			stmt = con.prepareStatement(updtUser);
+			stmt.setInt(1, ticketCount);
+			stmt.setInt(2, userid);
+			stmt.setInt(3, eventid);
+			System.out.println(stmt);
+			record = stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
+		return record;
+
+	}
 }

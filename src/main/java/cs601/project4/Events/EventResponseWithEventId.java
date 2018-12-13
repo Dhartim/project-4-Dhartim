@@ -1,5 +1,9 @@
 package cs601.project4.Events;
-
+/**
+ * EventResponseWithEventId - it holds response of event details with event id
+ * @author dhartimadeka
+ *
+ */
 public class EventResponseWithEventId 
 {
 	private int eventid;
@@ -9,8 +13,7 @@ public class EventResponseWithEventId
 	private int purchased;
 	
 	public EventResponseWithEventId()
-	{
-		
+	{	
 	}
 	public EventResponseWithEventId(int eventid, String eventname, int userid, int avail, int purchase)
 	{

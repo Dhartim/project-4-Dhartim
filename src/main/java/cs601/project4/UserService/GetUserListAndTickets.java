@@ -2,7 +2,6 @@ package cs601.project4.UserService;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,13 +17,19 @@ import cs601.project4.RequestResponseManager;
 import cs601.project4.Configuration.Configuration;
 import cs601.project4.Database.DBManager;
 import cs601.project4.Events.EventResponseWithEventId;
-import cs601.project4.Events.Events;
 import cs601.project4.Tickets.AddTicketBean;
-import cs601.project4.Tickets.Tickets;
 import cs601.project4.Tickets.TransferTicketBuffer;
 import cs601.project4.Users.UserDetails;
 import cs601.project4.Users.Users;
 
+/**
+ * handles following api's
+ * 	//GET /{userid}
+	//POST /{userid}/tickets/add
+	//POST /{userid}/tickets/transfer
+ * @author dhartimadeka
+ *
+ */
 //GET /{userid}
 //POST /{userid}/tickets/add
 //POST /{userid}/tickets/transfer
@@ -32,19 +37,20 @@ import cs601.project4.Users.Users;
 public class GetUserListAndTickets extends HttpServlet
 {
 
-	DBManager dbMngr = new DBManager();
-	int userId = 0;
-	Users user;
-	UserDetails userDetail;
-	String json;
-	Gson gson = new Gson();
-	Configuration config = Configuration.getInstance();
-	HttpURLConnection httpConn;
+	private DBManager dbMngr = new DBManager();
+	private int userId = 0;
+	private Users user;
+	private UserDetails userDetail;
+	private String json;
+	private Gson gson = new Gson();
+	private Configuration config = Configuration.getInstance();
+	private HttpURLConnection httpConn;
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException 
 	{
 		// set response and content type
 		resp.setStatus(HttpServletResponse.SC_OK);
+		//httpConn.setRequestMethod("GET");
 		resp.setContentType("application/json");
 		String[] re = req.getRequestURI().split("/");
 		if (re.length == 2 && re[1].matches("\\d+")) 
@@ -55,6 +61,12 @@ public class GetUserListAndTickets extends HttpServlet
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
 	}
+	/**
+	 * getUser - it gets details of user from database 
+	 * @param req - http servlet request
+	 * @param resp http servlet response
+	 * @throws IOException
+	 */
 	//get user
 	public void getUser(HttpServletRequest req, HttpServletResponse resp) throws IOException 
 	{
@@ -78,18 +90,15 @@ public class GetUserListAndTickets extends HttpServlet
 		// send response back to front api
 		resp.getWriter().append(json);
 	}
-	
+
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException 
 	{
 		// set response and content type
-		System.out.println("Inside post method here....");
 		resp.setStatus(HttpServletResponse.SC_OK);
 		resp.setContentType("application/json");
-
+		httpConn.setRequestMethod("POST");
 		String[] re = req.getRequestURI().split("/");
-		System.out.println("split url");
-		System.out.println(req.getRequestURI());
-		System.out.println(re[1]);
+		//checks uri
 		if (re.length == 4 && re[1].matches("\\d+") && re[2].equals("tickets")) 
 		{
 			if (re[3].equals("add")) 
@@ -108,17 +117,22 @@ public class GetUserListAndTickets extends HttpServlet
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
 	}
-	
+	/**
+	 * addTicket - add ticket to ticket table.
+	 * @param req - http servlet request
+	 * @param resp - http servlet response
+	 * @param userId - user id to send request it.
+	 */
 	//add ticket
 	public void addTicket(HttpServletRequest req, HttpServletResponse resp, int userId)
 	{
 		//check if userid exist or not
-//		boolean flag = dbMngr.isUserExist(userId);
-//		if(!flag)
-//		{
-//			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//			return;
-//		}
+		boolean flag = dbMngr.isUserExist(userId);
+		if(!flag)
+		{
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
 		boolean isDataUpdated = false;
 		//DBManagerUser dbManagerUser = new DBManagerUser();
 		Gson gson = new Gson();
@@ -136,18 +150,11 @@ public class GetUserListAndTickets extends HttpServlet
 		EventResponseWithEventId eventBean = gson.fromJson(eventData, EventResponseWithEventId.class);
 		System.out.println("event name : " + eventBean.getEventname());
 		System.out.println("avail : " + eventBean.getAvail() + ", purchased : " + eventBean.getPurchased()
-				+ ", total : " + (eventBean.getAvail() + eventBean.getPurchased()));
+		+ ", total : " + (eventBean.getAvail() + eventBean.getPurchased()));
 		if (eventBean.getAvail() > 0
 				&& (addTicketBean.getTickets() > 0)
 				&& ((eventBean.getAvail() + eventBean.getPurchased()) >= (eventBean.getPurchased() + addTicketBean.getTickets()))
 				&& ((eventBean.getAvail() - addTicketBean.getTickets()) >= 0))
-				//&& (eventBean.getNumticket() == (eventBean.getAvail() + eventBean.getPurchased()))) 
-		
-//		if (eventBean.getAvail() > 0
-//				&& (addTicketBean.getTickets() > 0)
-//				&& (eventBean.getNumticket() >= (eventBean.getPurchased() + addTicketBean.getTickets()))
-//				&& ((eventBean.getAvail() - addTicketBean.getTickets()) >= 0)
-//				&& (eventBean.getNumticket() == (eventBean.getAvail() + eventBean.getPurchased()))) 
 		{
 			isDataUpdated = dbMngr.addTickets(userId, addTicketBean.getEventid(), addTicketBean.getTickets());
 			//now pass request to event table to update that table
@@ -161,39 +168,45 @@ public class GetUserListAndTickets extends HttpServlet
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
 	}
-	
+
 	// transfer ticket
-		public void transferTicket(HttpServletRequest req, HttpServletResponse resp, int userid) 
+	/**
+	 * trtransferTicket - handles transfer of ticket from one user to another
+	 * @param req - http servlet request
+	 * @param resp - http servlet response
+	 * @param userid - user id to send to user service to check for user exist or not
+	 */
+	public void transferTicket(HttpServletRequest req, HttpServletResponse resp, int userid) 
+	{
+		//System.out.println(userid);
+		Gson gson = new Gson();
+		// Tickets tickets = new Tickets();
+		RequestResponseManager reManager = new RequestResponseManager();
+		TransferTicketBuffer tBuffer = new TransferTicketBuffer();
+		StringBuffer reqBody = reManager.readRequestBody(req);
+		try
 		{
-			//System.out.println(userid);
-			Gson gson = new Gson();
-			// Tickets tickets = new Tickets();
-			RequestResponseManager reManager = new RequestResponseManager();
-			TransferTicketBuffer tBuffer = new TransferTicketBuffer();
-			StringBuffer reqBody = reManager.readRequestBody(req);
-			try
-			{
-				tBuffer = gson.fromJson(reqBody.toString(), TransferTicketBuffer.class);
-			}catch(JsonSyntaxException jse)
-			{
-				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				return;
-			}
-			// check uerid exist and targetuser
-			boolean userflag = dbMngr.isUserExist(userid);
-			boolean targetUserFlag = dbMngr.isUserExist(tBuffer.getTargetuser());
-			if (!userflag || !targetUserFlag) {
-				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				return;
-			}
-			// check eventid exist or not
-			reManager.createRequest(config.getEventserviceurl(), tBuffer.getEventid(), resp);
-			System.out.println(resp.getStatus());
-			if (resp.getStatus() != HttpServletResponse.SC_OK) {
-				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				return;
-			}
-			dbMngr.transferTicket(tBuffer, userid, resp);
+			tBuffer = gson.fromJson(reqBody.toString(), TransferTicketBuffer.class);
+		}catch(JsonSyntaxException jse)
+		{
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
 		}
+		// check uerid exist and targetuser
+		boolean userflag = dbMngr.isUserExist(userid);
+		boolean targetUserFlag = dbMngr.isUserExist(tBuffer.getTargetuser());
+		if (!userflag || !targetUserFlag) {
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
+		// check eventid exist or not
+		reManager.createRequest(config.getEventserviceurl(), tBuffer.getEventid(), resp);
+		System.out.println(resp.getStatus());
+		if (resp.getStatus() != HttpServletResponse.SC_OK) {
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
+		dbMngr.transferTicket(tBuffer, userid, resp);
+	}
 
 }

@@ -4,20 +4,17 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 
 import cs601.project4.Configuration.Configuration;
-import cs601.project4.Configuration.ReadConfigurationFile;
-
+/**
+ * UserServer = handles user service api 
+ * @author dhartimadeka
+ *
+ */
 public class UserServer 
 {
 	public static void main(String args[]) 
 	{
-//		if(args.length != 1)
-//		{
-//			System.out.println("Please provide Configuration file");
-//			System.exit(0);
-//		}
-		//String configFileName = args[0];
 		Configuration config = Configuration.getInstance();
-		//config = new ReadConfigurationFile().readJsonFile(configFileName);
+		
 		Server server = new Server(config.getUserserviceport());
 		System.out.println(config.getUserserviceport());
 		ServletHandler handler = new ServletHandler();

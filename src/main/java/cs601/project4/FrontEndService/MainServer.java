@@ -6,28 +6,16 @@ import org.eclipse.jetty.servlet.ServletHandler;
 import com.google.gson.Gson;
 
 import cs601.project4.Configuration.Configuration;
-import cs601.project4.Configuration.ReadConfigurationFile;
 /**
- * It is main Server which will connect FrontEndService
+ * It is main Server which will connect front end service api
  * @author dhartimadeka
  *
  */
 public class MainServer 
 {
-	private Gson gson =  new Gson();
 	public static void main(String[] args) 
 	{
-//		if(args.length != 1)
-//		{
-//			System.out.println("Please provide Configuration file");
-//			System.exit(0);
-//		}
-//		String configFileName = args[0];
-		//make configuration file and connectdb singleton
 		Configuration config  = Configuration.getInstance();
-		//config = new ReadConfigurationFile().readJsonFile(configFileName);
-		//Configuration configuration = new ReadConfigurationFile().readJsonFile(ConfigFileName);
-		//passing port into server
 		System.out.println(config.getFrontendport());
 		Server server = new Server(config.getFrontendport());
 		ServletHandler handler = new ServletHandler();

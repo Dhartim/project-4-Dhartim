@@ -4,6 +4,11 @@ import java.util.List;
 
 import cs601.project4.Events.EventResponseWithEventId;
 
+/**
+ *  UserResponseFrontEnd  - response of user front end api
+ * @author dhartimadeka
+ *
+ */
 public class UserResponseFrontEnd {
 	private int userid;
 	private String username;

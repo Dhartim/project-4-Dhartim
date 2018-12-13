@@ -3,6 +3,11 @@ package cs601.project4.Users;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * UserDetails - class for details of user request from front end to back end
+ * @author dhartimadeka
+ *
+ */
 public class UserDetails {
 	private int userid;
 	private String username;

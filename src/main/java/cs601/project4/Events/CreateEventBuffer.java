@@ -1,5 +1,9 @@
 package cs601.project4.Events;
-
+/**
+ * CreateEventBuffer  buffer for create evnet request
+ * @author dhartimadeka
+ *
+ */
 public class CreateEventBuffer 
 {
 	private int userid;

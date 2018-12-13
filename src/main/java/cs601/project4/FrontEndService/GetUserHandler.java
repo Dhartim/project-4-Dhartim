@@ -11,8 +11,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.naming.ConfigurationException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,22 +20,25 @@ import com.google.gson.Gson;
 
 import cs601.project4.RequestResponseManager;
 import cs601.project4.Configuration.Configuration;
-import cs601.project4.Events.EventList;
 import cs601.project4.Events.EventResponseWithEventId;
 import cs601.project4.Tickets.TransferTicketBuffer;
 import cs601.project4.Users.UserDetails;
 import cs601.project4.Users.UserResponseFrontEnd;
-
-//GET /users/{userid}
-//POST /users/{userid}/tickets/transfer
+/**
+ * handles following api's
+ * //GET /users/{userid}
+	//POST /users/{userid}/tickets/transfer
+ * @author dhartimadeka
+ *
+ */
 @SuppressWarnings("serial")
 public class GetUserHandler extends HttpServlet
 {
-	HttpURLConnection httpConn;
-	InputStream input;
-	RequestResponseManager reMngr = new RequestResponseManager();
-	Configuration config = Configuration.getInstance();
-	Gson gson = new Gson();
+	private HttpURLConnection httpConn;
+	private InputStream input;
+	private RequestResponseManager reMngr = new RequestResponseManager();
+	private Configuration config = Configuration.getInstance();
+	private Gson gson = new Gson();
 	//GET /users/{userid}
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException 
@@ -66,8 +67,6 @@ public class GetUserHandler extends HttpServlet
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
-		//get event details in front end....how ???
-		System.out.println("send request");
 		input = httpConn.getInputStream();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 		StringBuffer responsebuffer = new StringBuffer();
@@ -77,54 +76,41 @@ public class GetUserHandler extends HttpServlet
 			responsebuffer.append(line);
 		}
 		System.out.println(responsebuffer.toString());
+		// get details of each event id
 		UserDetails userDetails = gson.fromJson(responsebuffer.toString(), UserDetails.class);
-		
-		/* new code */
 		UserResponseFrontEnd userResponseFrontEnd = getEachEventDetails(userDetails, req, resp);
 		String data = gson.toJson(userResponseFrontEnd, UserResponseFrontEnd.class);
-		// reader.close();
+		
 		PrintWriter writer = resp.getWriter().append(data + "\n");
 		writer.println();
-		/* new code end */
-		//getEachEventDetails(userDetails, resp);
-		//reader.close();
-		//PrintWriter writer = resp.getWriter().append(responsebuffer+"\n");
-		//writer.println();
 	}
 	// get eventdetails for each event id
-		public UserResponseFrontEnd getEachEventDetails(UserDetails userDetails, HttpServletRequest req,
-				HttpServletResponse resp) {
-			/* update this function */
-			EventResponseWithEventId envent = new EventResponseWithEventId();
-			UserResponseFrontEnd uResponseFrontEnd = new UserResponseFrontEnd();
-			List<EventResponseWithEventId> eventList = new ArrayList<EventResponseWithEventId>();
+	/**
+	 * getEachEventDetails - it gives details of each event id in tickets array.
+	 * @param userDetails -  it has user details data
+	 * @param req - http servlet request
+	 * @param resp - http servlet response
+	 * @return
+	 */
+	public UserResponseFrontEnd getEachEventDetails(UserDetails userDetails, HttpServletRequest req,
+			HttpServletResponse resp) {
+		/* update this function */
+		EventResponseWithEventId envent = new EventResponseWithEventId();
+		UserResponseFrontEnd uResponseFrontEnd = new UserResponseFrontEnd();
+		List<EventResponseWithEventId> eventList = new ArrayList<EventResponseWithEventId>();
 
-			List<HashMap<String, Integer>> tickets = userDetails.getTickets();
-			for (HashMap<String, Integer> listOfEvents : tickets) {
-				int eventid = listOfEvents.get("eventid");
-				System.out.println(eventid);
-				// create request to get event details
-				envent = reMngr.getEventDetails(eventid, req, resp);
-				eventList.add(envent);
-				System.out.println(eventList);
-			}
-			uResponseFrontEnd = new UserResponseFrontEnd(userDetails.getUserid(), userDetails.getUsername(), eventList);
-			return uResponseFrontEnd;
+		List<HashMap<String, Integer>> tickets = userDetails.getTickets();
+		for (HashMap<String, Integer> listOfEvents : tickets) {
+			int eventid = listOfEvents.get("eventid");
+			System.out.println(eventid);
+			// create request to get event details
+			envent = reMngr.getEventDetails(eventid, req, resp);
+			eventList.add(envent);
+			System.out.println(eventList);
 		}
-//	//get eventdetails for each event id
-//	public void getEachEventDetails(UserDetails userDetails, HttpServletRequest req, HttpServletResponse resp)
-//	{
-//		//List<EventList> eventsList = new ArrayList<EventList>();
-//		List<HashMap<String, Integer>> tickets = userDetails.getTickets();
-//		for(HashMap<String, Integer> listOfEvents : tickets)
-//		{
-//			int eventid = listOfEvents.get("eventid");
-//			System.out.println(eventid);
-//			//create request to get event details
-//			reMngr.getEventDetails(eventid, resp);
-//			//String jsondata = gson.toJson(reMngr.getEventDetails(eventid, req, resp));
-//		}
-//	}
+		uResponseFrontEnd = new UserResponseFrontEnd(userDetails.getUserid(), userDetails.getUsername(), eventList);
+		return uResponseFrontEnd;
+	}
 
 	//POST /users/{userid}/tickets/transfer
 	@Override

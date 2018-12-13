@@ -6,26 +6,20 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 
 import cs601.project4.Configuration.Configuration;
-import cs601.project4.Configuration.ReadConfigurationFile;
 import cs601.project4.Database.ConnectionDB;
 
-
+/**
+ * Eventserver - it is an event server and maps servlet with respective path
+ * @author dhartimadeka
+ *
+ */
 public class EventServer 
 {
 	public static void main(String args[])
 	{
-//		if(args.length != 1)
-//		{
-//			System.out.println("Please provide configuration file");
-//			System.exit(0);
-//		}
-//		String  configFileName = args[0];
 		Configuration config = Configuration.getInstance();
-		//config = new ReadConfigurationFile().readJsonFile(configFileName);
-		//connect to database
 		ConnectionDB conn = ConnectionDB.getInstance();
 		Connection connect = conn.connectDatabase();
-		//Connection connection = new ConnectionDB().connectDatabase();
 		Server server = new Server(config.getEventserviceport());
 		ServletHandler handler = new ServletHandler();
 		handler.addServletWithMapping(CreateEvent.class, "/create");

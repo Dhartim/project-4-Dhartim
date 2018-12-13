@@ -7,20 +7,22 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.w3c.dom.events.EventException;
-
 import com.google.gson.Gson;
 
 import cs601.project4.RequestResponseManager;
 import cs601.project4.Configuration.Configuration;
 import cs601.project4.Database.DBManager;
-import cs601.project4.Events.EventList;
+
 import cs601.project4.Events.EventPurchaseBean;
 import cs601.project4.Events.EventResponseWithEventId;
-import cs601.project4.Events.Events;
 
 //POST /purchase/{eventid}
 @SuppressWarnings("serial")
+/**
+ * PurchaseEventTickets - it handles //POST /purchase/{eventid} api
+ * @author dhartimadeka
+ *
+ */
 public class PurchaseEventTickets extends HttpServlet
 {
 	@Override
@@ -39,10 +41,9 @@ public class PurchaseEventTickets extends HttpServlet
 		//convert from json into string
 		eventPurchaseBean = gson.fromJson(reqBody.toString(), EventPurchaseBean.class);
 		//pass eventid from event purchase body to get event details of that event id.
-		
+
 		//event id exist or not
 		EventResponseWithEventId event = dbMngr.getEventDetailsWithId(eventPurchaseBean.getEventid(), resp);
-		System.out.println("event id exists");
 		if(resp.getStatus() != HttpServletResponse.SC_OK)
 		{
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -51,7 +52,6 @@ public class PurchaseEventTickets extends HttpServlet
 		System.out.println(config.getUserserviceurl() + eventPurchaseBean.getUserid());
 		//check userid exist or not and make user request
 		reManager.createRequest(config.getUserserviceurl(), eventPurchaseBean.getUserid(), resp);
-		System.out.println("user id exist");
 		System.out.println(resp.getStatus());
 		if(resp.getStatus() != HttpServletResponse.SC_OK)
 		{
@@ -64,16 +64,9 @@ public class PurchaseEventTickets extends HttpServlet
 				&& (event.getAvail() >= eventPurchaseBean.getTickets())
 				&& ((event.getAvail() + event.getPurchased()) >= (event.getPurchased() + eventPurchaseBean.getTickets()))
 				&& ((event.getAvail() - eventPurchaseBean.getTickets()) >= 0))
-				//&& ((event.getNumticket()) == (event.getAvail() + event.getPurchased()))) 
-//		if (event.getAvail() > 0 
-//				&& (eventPurchaseBean.getTickets() > 0)
-//				&& (event.getAvail() >= eventPurchaseBean.getTickets())
-//				&& ((event.getNumticket()) >= (event.getPurchased() + eventPurchaseBean.getTickets()))
-//				&& ((event.getAvail() - eventPurchaseBean.getTickets()) >= 0)
-//				&& ((event.getNumticket()) == (event.getAvail() + event.getPurchased()))) 
 		{
 			//now move to user service ....call post/userid/ticekts/add
-			reManager.createAddTicketRequest(config.getUserserviceurl(), eventPurchaseBean, req ,resp);
+			reManager.createAddTicketRequest(eventPurchaseBean, req ,resp);
 			System.out.println(resp.getStatus());
 			if(resp.getStatus() != HttpServletResponse.SC_OK)
 			{

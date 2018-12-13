@@ -1,41 +1,39 @@
 package cs601.project4.FrontEndService;
-
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.URL;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import cs601.project4.Configuration.Configuration;
-
+/**
+ * EventHandler - it handles get events list
+ * @author dhartimadeka
+ *
+ */
 //GET /events
 @SuppressWarnings("serial")
 public class EventHandler extends HttpServlet 
 {
 	private HttpURLConnection httpConn;
 	private InputStream input;
-	Configuration config = Configuration.getInstance();
-	URL url;
+	private Configuration config = Configuration.getInstance();
+	private URL url;
 	//GET /events
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 	{	
 		resp.setStatus(HttpServletResponse.SC_OK);
 		System.out.println(req.getPathInfo());
-		//if(req.getPathInfo())
         try {
         	url =  new URL(config.getEventserviceurl()+ "list");
 			httpConn = (HttpURLConnection) url.openConnection();
-			 //httpConn.setRequestProperty("", "");
 			httpConn.setRequestMethod("GET");
 	        httpConn.setRequestProperty("Content-Type", "application/json");
 	        httpConn.setRequestProperty("Accept", "application/json");
@@ -55,8 +53,7 @@ public class EventHandler extends HttpServlet
 	        while ((line = reader.readLine()) != null) 
 	        {
 	        	responsebuffer.append(line);
-	        	responsebuffer.append("\n");
-	           // System.out.println(line); 
+	        	responsebuffer.append("\n"); 
 	        }
 	        reader.close();
 	        PrintWriter writer = resp.getWriter().append(responsebuffer);

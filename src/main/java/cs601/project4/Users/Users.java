@@ -1,5 +1,10 @@
 package cs601.project4.Users;
 
+/**
+ *  Users  - holds data of users
+ * @author dhartimadeka
+ *
+ */
 public class Users {
 	private int userId;
 	private String username;

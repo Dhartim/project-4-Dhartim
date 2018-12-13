@@ -1,5 +1,10 @@
 package cs601.project4.Events;
 
+/**
+ * EventPurchaseBean  - holds purchase ticket request
+ * @author dhartimadeka
+ *
+ */
 public class EventPurchaseBean 
 {
 	private int userid;

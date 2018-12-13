@@ -7,7 +7,11 @@ import java.util.logging.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-
+/**
+ * Configuration - holds all configuration files values in it.
+ * @author dhartimadeka
+ *
+ */
 public class Configuration 
 {
 	private static Gson gson = new Gson();
@@ -28,7 +32,10 @@ public class Configuration
 	
 	private Configuration()
 	{}
-	
+	/**
+	 * getinstance() - it will create configuration class object only once and ready values from configuration file
+	 * @return
+	 */
 	public static Configuration getInstance()
 	{
 		if(instance ==  null)

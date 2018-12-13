@@ -14,17 +14,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.gson.Gson;
-
 import cs601.project4.Configuration.Configuration;
-
+/**
+ *  CreateUserHandler - handles create user api
+ * @author dhartimadeka
+ *
+ */
 //POST /users/create
 @SuppressWarnings("serial")
 public class CreateUserHandler extends HttpServlet
 {
 	private HttpURLConnection httpConn;
 	private InputStream input;
-	private Gson gson = new Gson();
 	private Configuration config = Configuration.getInstance();
 	//StringBuffer jb;
 	@Override
@@ -68,7 +69,5 @@ public class CreateUserHandler extends HttpServlet
 		bufferreader.close();
 		PrintWriter writer = resp.getWriter().append(responsebuffer +"\n");
 		writer.println();
-
-
 	}
 }

@@ -1,5 +1,10 @@
 package cs601.project4.Tickets;
 
+/**
+ * TransferTicketBuffer  - holds ticket's request body from backend  to user service  
+ * @author dhartimadeka
+ *
+ */
 public class TransferTicketBuffer 
 {
 	private int eventid;

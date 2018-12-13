@@ -19,14 +19,20 @@ import cs601.project4.RequestResponseManager;
 import cs601.project4.Configuration.Configuration;
 import cs601.project4.Events.EventPurchaseBean;
 
-//GET /events/{eventid}
-//POST /events/{eventid}/purchase/{userid}
+/**
+ * GetEventsHandler -  handles  following api's
+ * //GET /events/{eventid}
+	//POST /events/{eventid}/purchase/{userid}
+ * @author dhartimadeka
+ *
+ */
+
 @SuppressWarnings("serial")
 public class GetEventsHandler extends HttpServlet
 {
-	HttpURLConnection httpConn;
-	InputStream input;
-	Configuration config = Configuration.getInstance();
+	private HttpURLConnection httpConn;
+	private InputStream input;
+	private Configuration config = Configuration.getInstance();
 	//GET /events/{eventid}
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException 
@@ -43,7 +49,6 @@ public class GetEventsHandler extends HttpServlet
 		//check for eventid
 		if(eventid == null || eventid.isEmpty() || !(eventid.matches("\\d+")) || (req.getPathInfo().split("/").length != 2))
 		{
-			System.out.println("here");
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}

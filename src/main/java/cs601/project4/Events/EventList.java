@@ -1,5 +1,10 @@
 package cs601.project4.Events;
 
+/**
+ * EventList - holds list of events
+ * @author dhartimadeka
+ *
+ */
 public class EventList 
 {
 	private int eventid;

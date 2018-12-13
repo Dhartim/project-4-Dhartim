@@ -1,11 +1,6 @@
 package cs601.project4.EventService;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,20 +9,19 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
-import cs601.project4.Database.ConnectionDB;
 import cs601.project4.Database.DBManager;
 
 //GET /{eventid}
 @SuppressWarnings("serial")
+/**
+ * GetEventListWithEventId - holds list of events with details when eventid is specified
+ * @author dhartimadeka
+ *
+ */
 public class GetEventListWithEventId extends HttpServlet
 {
-	private PreparedStatement statement;
-	private ResultSet resultSet;
-	Gson gson = new Gson();
-	//connection to database
-	ConnectionDB conn = ConnectionDB.getInstance();
-	Connection connection = conn.connectDatabase();
-	DBManager dbMngr = new DBManager();
+	private Gson gson = new Gson();
+	private DBManager dbMngr = new DBManager();
 	//GET /{eventid}
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException 
@@ -49,10 +43,12 @@ public class GetEventListWithEventId extends HttpServlet
 		String json = gson.toJson(dbMngr.getEventDetailsWithId(eventId, resp));
 		//send response back to front api
 		resp.getWriter().append(json.toLowerCase() + "\n");
-		//writer.println();
-		//resp.getWriter().append(resp.getStatus());
 	}
-
+	/**
+	 * checks url length
+	 * @param req
+	 * @param resp
+	 */
 	public void checkRequestURL(HttpServletRequest req, HttpServletResponse resp)
 	{
 		if(req.getRequestURI().split("/").length != 2)

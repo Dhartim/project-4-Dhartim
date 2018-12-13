@@ -1,39 +1,41 @@
 package cs601.project4;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
+
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Collection;
-import java.util.Locale;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
 import cs601.project4.Configuration.Configuration;
-import cs601.project4.EventService.CreateEvent;
 import cs601.project4.Events.CreateEventBuffer;
-import cs601.project4.Events.EventList;
 import cs601.project4.Events.EventPurchaseBean;
 import cs601.project4.Events.EventResponseWithEventId;
 import cs601.project4.Tickets.TransferTicketBuffer;
-
+/**
+ * RequestResponseManager - It will handler Request and Response URL from one servlet to another
+ * @author dhartimadeka
+ *
+ */
 public class RequestResponseManager {
 
-	HttpURLConnection httpConn;
-	Configuration config = Configuration.getInstance();
-	Gson gson = new Gson();
-	// ready body part of request
+	private HttpURLConnection httpConn;
+	private Configuration config = Configuration.getInstance();
+	private Gson gson = new Gson();
+	
+	/**
+	 * readRequestBody - it will read request body of any request passed to it
+	 * @param request - HttpServletRequest pased from one servlet to another
+	 * @return
+	 */
 	public StringBuffer readRequestBody(HttpServletRequest request) 
 	{
 		String line;
@@ -52,7 +54,11 @@ public class RequestResponseManager {
 		System.out.println(buffer.toString());
 		return buffer;
 	}
-
+	/**
+	 * checkRequestURL - It will check length of URL 
+	 * @param req - HttpServletRequest is request passed to it 
+	 * @param resp - HttpServletResponse is response.
+	 */
 	public void checkRequestURL(HttpServletRequest req, HttpServletResponse resp) {
 		if (req.getRequestURI().split("/").length != 2) {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -64,7 +70,11 @@ public class RequestResponseManager {
 			}
 		}
 	}
-	
+	/**
+	 * getUrlContents - Used to read content in url
+	 * @param theUrl - url is passed which is used for url connection
+	 * @return it will return content read from url
+	 */
 	public String getUrlContents(String theUrl) {
 		StringBuilder content = new StringBuilder();
 
@@ -92,7 +102,12 @@ public class RequestResponseManager {
 		}
 		return content.toString();
 	}
-	
+	/**
+	 * createRequest - will create simple request of type get
+	 * @param uri - pass uri 
+	 * @param requestid - any eventid or userid
+	 * @param resp - to set response code in it
+	 */
 	public void createRequest(String uri, int requestid, HttpServletResponse resp)
 	{
 		URL url;
@@ -107,8 +122,6 @@ public class RequestResponseManager {
 			httpConn.setDoOutput(false); // false indicates this is a GET request
 			httpConn.connect();
 			resp.setStatus(httpConn.getResponseCode());
-			//int resp = httpConn.getResponseCode();
-			//System.out.println("request send..." + resp);
 			if(resp.getStatus() != 200)
 			{
 				System.out.println("here");
@@ -117,19 +130,21 @@ public class RequestResponseManager {
 			}
 			InputStream input = httpConn.getInputStream();
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		//return resp;
 	}
-	
-	public void createAddTicketRequest(String uri, EventPurchaseBean eventPurchase, HttpServletRequest req, HttpServletResponse resp)
+	/**
+	 * createAddTicketRequest - request to user service to add ticket is made
+	 * @param eventPurchase  EventPurchase class which holds event purchase userid in body
+	 * @param req - httpServlet request
+	 * @param resp - httpServlet response
+	 */
+	public void createAddTicketRequest(EventPurchaseBean eventPurchase, HttpServletRequest req, HttpServletResponse resp)
 	{
 		try {
 			System.out.println("inside create add ticket ...");
+			//url to user service with userid
 			URL url = new URL(config.getUserserviceurl() + eventPurchase.getUserid() + "/tickets/add");
 			System.out.println(url.toString());
 			httpConn = (HttpURLConnection) url.openConnection();
@@ -137,7 +152,7 @@ public class RequestResponseManager {
 			httpConn.setRequestProperty("Content-Type", "application/json");
 			httpConn.setRequestProperty("Accept", "application/json");
 			System.out.println(".....\n" +readRequestBody(req).toString());
-			httpConn.setDoOutput(true); // false indicates this is a GET request
+			httpConn.setDoOutput(true); 
 			///need to send request body with post request
 			OutputStream out = httpConn.getOutputStream(); //getBytes("UTF-8")
 			//pass eventid and tickets here...
@@ -163,6 +178,14 @@ public class RequestResponseManager {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * createPurchaseRequest - creates purchase request to event service api from frontend to backend
+	 * @param purchasepath - holds path of purchase api
+	 * @param eventid - holds event id for which request is
+	 * @param eventPurchase - holds event id and tickets to be passed in request
+	 * @param resp - Http servlet reponse
+	 * @param req - Http Servlet request
+	 */
 	//create request from frontend to backend
 	public void createPurchaseRequest(String purchasepath, int eventid, EventPurchaseBean eventPurchase, HttpServletResponse resp, HttpServletRequest req)
 	{
@@ -174,11 +197,10 @@ public class RequestResponseManager {
 			httpConn.setRequestMethod("POST");
 			httpConn.setRequestProperty("Content-Type", "application/json");
 			httpConn.setRequestProperty("Accept", "application/json");
-			httpConn.setDoOutput(true); // false indicates this is a GET request
+			httpConn.setDoOutput(true); 
 			///need to send request body with post request
 			OutputStream out = httpConn.getOutputStream(); //getBytes("UTF-8")
 			//pass eventid and tickets here...
-			
 			out.write(gson.toJson(eventPurchase).getBytes("UTF-8"));
 			httpConn.connect();
 			resp.setStatus(httpConn.getResponseCode());
@@ -201,6 +223,13 @@ public class RequestResponseManager {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * createTransferRequest  - Create a httpurl connection request to ticket transfer api
+	 * @param url - holds path of transfer ticket api
+	 * @param ticketBuffer - holds body of transfer ticket api
+	 * @param resp - sets httpservlet response status in it
+	 * @param req - httpservlet request
+	 */
 	//transfer request
 	public void createTransferRequest(URL url, TransferTicketBuffer ticketBuffer, HttpServletResponse resp, HttpServletRequest req)
 	{
@@ -211,7 +240,7 @@ public class RequestResponseManager {
 			httpConn.setRequestProperty("Accept", "application/json");
 			httpConn.setDoOutput(true);
 			OutputStream out = httpConn.getOutputStream(); //getBytes("UTF-8")
-			//pass eventid and tickets here...
+			//pass tickets, target user and  event id
 			out.write(gson.toJson(ticketBuffer).getBytes("UTF-8"));
 			httpConn.connect();
 			resp.setStatus(httpConn.getResponseCode());
@@ -235,7 +264,13 @@ public class RequestResponseManager {
 		}
 	}
 	
-	//create event 
+	/**
+	 * createEventRequest - creates Event Request to from front end to backend to create event api
+	 * @param url - holds create event api path
+	 * @param createEvent - it holds create event request body
+	 * @param req -  it holds httpservlet request 
+	 * @param resp - it has httpservlet response code
+	 */
 	public void createEventRequest(URL url, CreateEventBuffer createEvent, HttpServletRequest req, HttpServletResponse resp)
 	{
 		StringBuffer buffer = new StringBuffer();
@@ -249,7 +284,8 @@ public class RequestResponseManager {
 			//pass request body in request
 			out.write(gson.toJson(createEvent).getBytes("UTF-8"));
 			httpConn.connect();
-			if(httpConn.getResponseCode() != 200)
+			resp.setStatus(httpConn.getResponseCode());
+			if(resp.getStatus() != 200)
 			{
 				System.out.println("here");
 				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -275,9 +311,18 @@ public class RequestResponseManager {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * getEventDetails - it will give details of events by passing request to event service
+	 *  from frontend to backend.
+	 * @param eventid - holds event id to be passed in event api
+	 * @param req - http servlet request
+	 * @param resp - http servlet resp
+	 * @return
+	 */
 	// create request to get event details
 		public EventResponseWithEventId getEventDetails(int eventid, HttpServletRequest req, HttpServletResponse resp) 
 		{
+			resp.setStatus(HttpServletResponse.SC_OK);
 			StringBuffer buffer = new StringBuffer();
 			EventResponseWithEventId eWithEventId = new EventResponseWithEventId();
 			URL url;
@@ -289,7 +334,8 @@ public class RequestResponseManager {
 				httpConn.setRequestProperty("Accept", "application/json");
 				httpConn.setDoOutput(true);
 				httpConn.connect();
-				if (httpConn.getResponseCode() != 200) {
+				if (httpConn.getResponseCode() != 200) 
+				{
 					System.out.println("here");
 					resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					return null;
@@ -302,10 +348,7 @@ public class RequestResponseManager {
 				}
 				resp.setStatus(httpConn.getResponseCode());
 				eWithEventId = gson.fromJson(buffer.toString(), EventResponseWithEventId.class);
-				//String eventDetails = gson.toJson(eWithEventId);
-				//resp.getWriter().println(eventDetails);
 			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -313,44 +356,5 @@ public class RequestResponseManager {
 			}
 			return eWithEventId;
 		}
-	
-	//create request to get event details
-//	public void getEventDetails(int eventid, HttpServletResponse resp)
-//	{
-//		StringBuffer buffer = new StringBuffer();
-//		URL url;
-//		try {
-//			url = new URL(config.getEventserviceurl()+eventid);
-//			httpConn = (HttpURLConnection) url.openConnection();
-//			httpConn.setRequestMethod("GET");
-//			httpConn.setRequestProperty("Content-Type", "application/json");
-//			httpConn.setRequestProperty("Accept", "application/json");
-//			httpConn.setDoOutput(true); 
-//			httpConn.connect();
-//			if(httpConn.getResponseCode() != 200)
-//			{
-//				System.out.println("here");
-//				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//				return;
-//			}
-//			BufferedReader in = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
-//			String line;
-//			while((line = in.readLine()) != null) {
-//				buffer.append(line);
-//				System.out.println(buffer.toString());
-//			}
-//			resp.setStatus(httpConn.getResponseCode());
-//			System.out.println("?????"+buffer.toString());
-//			String eventDetails = gson.toJson(buffer.toString(), EventResponseWithEventId.class);
-//			resp.getWriter().println(eventDetails);
-//		} catch (MalformedURLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-//	}
 
 }

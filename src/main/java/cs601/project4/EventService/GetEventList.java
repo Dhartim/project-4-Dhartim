@@ -16,6 +16,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 //GET /list
+/**
+ * GetEventList - it gives list of events from evnet service
+ * @author dhartimadeka
+ *
+ */
 @SuppressWarnings("serial")
 public class GetEventList extends HttpServlet
 {

@@ -1,5 +1,9 @@
 package cs601.project4.Database;
-
+/**
+ * DatabaseFields - it holds all actual names of database fields
+ * @author dhartimadeka
+ *
+ */
 public interface DatabaseFields 
 {
 	String eventTable = "events";

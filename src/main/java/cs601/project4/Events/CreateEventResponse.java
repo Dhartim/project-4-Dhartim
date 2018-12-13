@@ -1,5 +1,9 @@
 package cs601.project4.Events;
-
+/**
+ * CreateEventResponse  - holds create event response
+ * @author dhartimadeka
+ *
+ */
 public class CreateEventResponse 
 {
 	private int eventid;

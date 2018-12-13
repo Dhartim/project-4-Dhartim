@@ -1,5 +1,10 @@
 package cs601.project4.Tickets;
 
+/**
+ * Tickets  - it holds tickets request body
+ * @author dhartimadeka
+ *
+ */
 public class Tickets 
 {
 	private int userId;

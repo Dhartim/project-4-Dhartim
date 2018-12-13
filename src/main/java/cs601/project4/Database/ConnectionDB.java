@@ -5,13 +5,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import cs601.project4.Configuration.Configuration;
-import cs601.project4.Configuration.ReadConfigurationFile;
+
+/**
+ * ConnectionDB - it will establish a connection with database 
+ * @author dhartimadeka
+ *
+ */
 public class ConnectionDB 
 {
-	private static ConnectionDB instance;// = new ConnectionDB();
-	private String username = "user03";
-	private String password = "user03";
-	private String db = "user03";
+	private static ConnectionDB instance;
 	private Connection con;
 	private Configuration config = Configuration.getInstance();
     //private constructor to avoid client applications to use constructor
@@ -28,6 +30,10 @@ public class ConnectionDB
     	}
         return instance;
     }
+    /**
+     * connectDatabase - it will establish connection to database
+     * @return
+     */
 	public Connection connectDatabase()
 	{
 		try {
@@ -38,14 +44,14 @@ public class ConnectionDB
 			System.err.println("Can't find driver");
 			System.exit(1);
 		}
-		String urlString = config.getDatabaseurl() + config.getDatabase();//"jdbc:mysql://127.0.0.1:3306/"+db;
+		String urlString = config.getDatabaseurl() + config.getDatabase();
 		System.out.println(urlString);
 		//Must set time zone explicitly in newer versions of mySQL.
 		String timeZoneSettings = "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 		
 		try {
 			System.out.println("going to connect");
-			con = DriverManager.getConnection(urlString+timeZoneSettings,config.getUsername(),config.getPassword());//username,password);
+			con = DriverManager.getConnection(urlString+timeZoneSettings,config.getUsername(),config.getPassword());
 			System.out.println("connected...");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

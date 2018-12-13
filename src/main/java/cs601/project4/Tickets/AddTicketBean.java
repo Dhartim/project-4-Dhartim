@@ -1,5 +1,9 @@
 package cs601.project4.Tickets;
-
+/**
+ * AddTicketBean  - it holds addticket request buffer
+ * @author dhartimadeka
+ *
+ */
 public class AddTicketBean 
 {
 	private int userid;
