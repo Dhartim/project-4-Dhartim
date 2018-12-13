@@ -81,8 +81,8 @@ public class GetUserHandler extends HttpServlet
 		UserResponseFrontEnd userResponseFrontEnd = getEachEventDetails(userDetails, req, resp);
 		String data = gson.toJson(userResponseFrontEnd, UserResponseFrontEnd.class);
 		
-		PrintWriter writer = resp.getWriter().append(data + "\n");
-		writer.println();
+		PrintWriter writer = resp.getWriter().append(data);
+		//writer.println();
 	}
 	// get eventdetails for each event id
 	/**

@@ -52,7 +52,7 @@ public class CreateUser extends HttpServlet
 		String json = gson.toJson(user, Users.class);
 		// send response back to front api
 		writer = resp.getWriter().append(json.toLowerCase());
-		writer.println();
+		//writer.println();
 	}
 
 }

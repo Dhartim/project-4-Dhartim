@@ -42,7 +42,7 @@ public class GetEventListWithEventId extends HttpServlet
 		//pass response back;
 		String json = gson.toJson(dbMngr.getEventDetailsWithId(eventId, resp));
 		//send response back to front api
-		resp.getWriter().append(json.toLowerCase() + "\n");
+		resp.getWriter().append(json.toLowerCase());
 	}
 	/**
 	 * checks url length

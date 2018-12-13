@@ -77,7 +77,7 @@ public class GetUserListAndTickets extends HttpServlet
 		if(!flag)
 		{
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			resp.getWriter().append("invalid user");
+			//resp.getWriter().append("invalid user");
 			return;
 		}
 		user = dbMngr.getUser(userId);

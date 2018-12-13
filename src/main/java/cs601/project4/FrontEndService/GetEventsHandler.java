@@ -74,12 +74,12 @@ public class GetEventsHandler extends HttpServlet
 		while ((line = reader.readLine()) != null) 
 		{
 			responsebuffer.append(line);
-			responsebuffer.append("\n");
+			//responsebuffer.append("\n");
 			// System.out.println(line); 
 		}
 		reader.close();
-		PrintWriter writer = resp.getWriter().append(responsebuffer+"\n");
-		writer.println();
+		PrintWriter writer = resp.getWriter().append(responsebuffer);
+		//writer.println();
 	}
 
 	//POST /events/{eventid}/purchase/{userid}

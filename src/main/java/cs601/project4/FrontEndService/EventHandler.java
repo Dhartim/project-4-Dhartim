@@ -53,11 +53,11 @@ public class EventHandler extends HttpServlet
 	        while ((line = reader.readLine()) != null) 
 	        {
 	        	responsebuffer.append(line);
-	        	responsebuffer.append("\n"); 
+	        	//responsebuffer.append("\n"); 
 	        }
 	        reader.close();
 	        PrintWriter writer = resp.getWriter().append(responsebuffer);
-	        writer.println();
+	       //writer.println();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);

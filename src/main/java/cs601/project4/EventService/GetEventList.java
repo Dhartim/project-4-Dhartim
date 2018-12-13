@@ -45,7 +45,7 @@ public class GetEventList extends HttpServlet
 		String json = gson.toJson(result);
 		//send response back to front api
 		PrintWriter writer = resp.getWriter().append(json);
-		writer.println();
+		//writer.println();
 		//System.out.println(json);
 
 	}

@@ -67,7 +67,7 @@ public class CreateUserHandler extends HttpServlet
 			responsebuffer.append(line);
 		}
 		bufferreader.close();
-		PrintWriter writer = resp.getWriter().append(responsebuffer +"\n");
-		writer.println();
+		PrintWriter writer = resp.getWriter().append(responsebuffer);
+		//writer.println();
 	}
 }

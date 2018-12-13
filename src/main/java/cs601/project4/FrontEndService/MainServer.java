@@ -37,7 +37,10 @@ public class MainServer
 			}
 		}
 	}
-	
+	/**
+	 * mapping - method to map all servlets with respective paths
+	 * @param handler - it handles servlet handlers
+	 */
 	public static void mapping(ServletHandler handler)
 	{
 		handler.addServletWithMapping(EventHandler.class, "/events");

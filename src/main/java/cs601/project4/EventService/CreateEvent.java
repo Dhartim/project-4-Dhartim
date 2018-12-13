@@ -62,7 +62,7 @@ public class CreateEvent extends HttpServlet
 		String json = gson.toJson(event);
 		// send response back to front api
 		writer = resp.getWriter().append(json.toLowerCase());
-		writer.println();
+		//writer.println();
 	}
 
 }
